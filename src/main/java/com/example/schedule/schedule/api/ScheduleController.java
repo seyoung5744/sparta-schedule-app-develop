@@ -1,6 +1,7 @@
 package com.example.schedule.schedule.api;
 
 import com.example.schedule.schedule.dto.request.CreateScheduleRequest;
+import com.example.schedule.schedule.dto.request.EditScheduleTitleAndContentsRequest;
 import com.example.schedule.schedule.dto.response.ScheduleResponse;
 import com.example.schedule.schedule.service.ScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,5 +45,13 @@ public class ScheduleController {
     public ResponseEntity<List<ScheduleResponse>> getAllSchedule() {
         List<ScheduleResponse> scheduleResponses = scheduleService.getAllSchedule();
         return ResponseEntity.ok(scheduleResponses);
+    }
+
+    @Operation(summary = "일정 수정", description = "ID에 해당하는 일정의 제목, 내용을 수정합니다.")
+    @ApiResponse(responseCode = "200", description = "일정 수정 성공")
+    @PatchMapping("/{id}")
+    public ResponseEntity<ScheduleResponse> editScheduleTitleAndContents(@PathVariable Long id, @RequestBody EditScheduleTitleAndContentsRequest request) {
+        ScheduleResponse scheduleResponse = scheduleService.editScheduleTitleAndContents(id, request);
+        return ResponseEntity.ok(scheduleResponse);
     }
 }
