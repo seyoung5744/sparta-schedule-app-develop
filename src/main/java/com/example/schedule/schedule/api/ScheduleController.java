@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/v1/schedules")
 @RequiredArgsConstructor
@@ -33,5 +35,14 @@ public class ScheduleController {
     public ResponseEntity<ScheduleResponse> getSchedule(@PathVariable Long id) {
         ScheduleResponse scheduleResponse = scheduleService.getScheduleById(id);
         return ResponseEntity.ok(scheduleResponse);
+    }
+
+
+    @Operation(summary = "전체 일정 조회", description = "전체 일정을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "전체 일정 조회 성공")
+    @GetMapping
+    public ResponseEntity<List<ScheduleResponse>> getAllSchedule() {
+        List<ScheduleResponse> scheduleResponses = scheduleService.getAllSchedule();
+        return ResponseEntity.ok(scheduleResponses);
     }
 }

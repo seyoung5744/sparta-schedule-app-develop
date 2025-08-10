@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -25,5 +27,11 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 일정입니다."));
         return ScheduleResponse.of(schedule);
+    }
+
+    public List<ScheduleResponse> getAllSchedule() {
+        return scheduleRepository.findAll().stream()
+                .map(ScheduleResponse::of)
+                .toList();
     }
 }
