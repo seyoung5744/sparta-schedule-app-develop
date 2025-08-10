@@ -1,6 +1,7 @@
 package com.example.schedule.schedule.service;
 
 import com.example.schedule.schedule.dto.request.CreateScheduleRequest;
+import com.example.schedule.schedule.dto.request.EditScheduleTitleAndContentsRequest;
 import com.example.schedule.schedule.dto.response.ScheduleResponse;
 import com.example.schedule.schedule.entity.Schedule;
 import com.example.schedule.schedule.repository.ScheduleRepository;
@@ -23,7 +24,7 @@ public class ScheduleService {
         return ScheduleResponse.of(schedule);
     }
 
-    public ScheduleResponse getScheduleById(Long id) {
+    public ScheduleResponse getScheduleById(final Long id) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 일정입니다."));
         return ScheduleResponse.of(schedule);
@@ -33,5 +34,14 @@ public class ScheduleService {
         return scheduleRepository.findAll().stream()
                 .map(ScheduleResponse::of)
                 .toList();
+    }
+
+    @Transactional
+    public ScheduleResponse editScheduleTitleAndContents(final Long id, final EditScheduleTitleAndContentsRequest request) {
+        Schedule schedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 일정입니다."));
+
+        schedule.updateTitleAndContents(request.getTitle(), request.getContents());
+        return ScheduleResponse.of(schedule);
     }
 }
