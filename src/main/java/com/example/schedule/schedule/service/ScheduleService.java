@@ -20,4 +20,10 @@ public class ScheduleService {
         final Schedule schedule = scheduleRepository.save(request.toEntity());
         return ScheduleResponse.of(schedule);
     }
+
+    public ScheduleResponse getScheduleById(Long id) {
+        Schedule schedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 일정입니다."));
+        return ScheduleResponse.of(schedule);
+    }
 }
