@@ -54,4 +54,12 @@ public class ScheduleController {
         ScheduleResponse scheduleResponse = scheduleService.editScheduleTitleAndContents(id, request);
         return ResponseEntity.ok(scheduleResponse);
     }
+
+    @Operation(summary = "일정 삭제", description = "ID에 해당하는 일정을 삭제합니다.")
+    @ApiResponse(responseCode = "204", description = "일정 삭제 성공 (No Content)")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id) {
+        scheduleService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }

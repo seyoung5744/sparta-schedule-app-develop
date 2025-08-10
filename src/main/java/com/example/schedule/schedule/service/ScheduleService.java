@@ -44,4 +44,11 @@ public class ScheduleService {
         schedule.updateTitleAndContents(request.getTitle(), request.getContents());
         return ScheduleResponse.of(schedule);
     }
+
+    @Transactional
+    public void deleteById(Long id) {
+        Schedule schedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 일정입니다."));
+        scheduleRepository.delete(schedule);
+    }
 }
