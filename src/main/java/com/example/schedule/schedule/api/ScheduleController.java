@@ -1,0 +1,32 @@
+package com.example.schedule.schedule.api;
+
+import com.example.schedule.schedule.dto.request.CreateScheduleRequest;
+import com.example.schedule.schedule.dto.response.ScheduleResponse;
+import com.example.schedule.schedule.service.ScheduleService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/v1/schedules")
+@RequiredArgsConstructor
+public class ScheduleController {
+
+    private final ScheduleService scheduleService;
+
+    @Operation(summary = "일정 생성", description = "새로운 일정을 등록합니다.")
+    @ApiResponse(responseCode = "201", description = "일정 생성 성공")
+    @PostMapping
+    public ResponseEntity<ScheduleResponse> create(@RequestBody CreateScheduleRequest request) {
+        ScheduleResponse scheduleResponse = scheduleService.create(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(scheduleResponse);
+    }
+}
