@@ -28,7 +28,7 @@ public class ScheduleController {
     }
 
     @Operation(summary = "특정 일정 조회", description = "ID에 해당하는 일정을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "일정 조회 성고")
+    @ApiResponse(responseCode = "200", description = "일정 조회 성공")
     @GetMapping("/{id}")
     public ResponseEntity<ScheduleResponse> getSchedule(@PathVariable Long id) {
         ScheduleResponse scheduleResponse = scheduleService.getScheduleById(id);
