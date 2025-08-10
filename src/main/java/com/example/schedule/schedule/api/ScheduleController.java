@@ -8,10 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/schedules")
@@ -28,5 +27,22 @@ public class ScheduleController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(scheduleResponse);
+    }
+
+    @Operation(summary = "특정 일정 조회", description = "ID에 해당하는 일정을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "일정 조회 성공")
+    @GetMapping("/{id}")
+    public ResponseEntity<ScheduleResponse> getSchedule(@PathVariable Long id) {
+        ScheduleResponse scheduleResponse = scheduleService.getScheduleById(id);
+        return ResponseEntity.ok(scheduleResponse);
+    }
+
+
+    @Operation(summary = "전체 일정 조회", description = "전체 일정을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "전체 일정 조회 성공")
+    @GetMapping
+    public ResponseEntity<List<ScheduleResponse>> getAllSchedule() {
+        List<ScheduleResponse> scheduleResponses = scheduleService.getAllSchedule();
+        return ResponseEntity.ok(scheduleResponses);
     }
 }
