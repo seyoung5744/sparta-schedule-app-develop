@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.ObjectUtils;
 
 @Getter
 @Entity
@@ -37,5 +38,9 @@ public class User extends BaseEntity {
     public void updateNameAndEmail(String name, String email) {
         this.name = name;
         this.email = email;
+    }
+
+    public boolean isOwnerOf(User target) {
+        return ObjectUtils.nullSafeEquals(this, target);
     }
 }
