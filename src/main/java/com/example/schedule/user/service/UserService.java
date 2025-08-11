@@ -1,5 +1,6 @@
 package com.example.schedule.user.service;
 
+import com.example.schedule.user.dto.request.UpdateUserInfoRequest;
 import com.example.schedule.user.dto.response.UserInfoResponse;
 import com.example.schedule.user.entity.User;
 import com.example.schedule.user.repository.UserRepository;
@@ -18,5 +19,24 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 회원입니다."));
         return UserInfoResponse.of(user);
+    }
+
+    @Transactional
+    public UserInfoResponse updateUserInfo(Long id, UpdateUserInfoRequest request) {
+
+        if (isUserExistsByEmailAndIdIsNot(request.getEmail(), id)) {
+            throw new IllegalArgumentException("이미 사용중인 이메일입니다.");
+        }
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 회원입니다."));
+
+        user.updateNameAndEmail(request.getName(), request.getEmail());
+        userRepository.flush();
+        return UserInfoResponse.of(user);
+    }
+
+    private boolean isUserExistsByEmailAndIdIsNot(String email, Long id) {
+        return userRepository.existsByEmailAndIdIsNot(email, id);
     }
 }
