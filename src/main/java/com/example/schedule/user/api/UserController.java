@@ -1,15 +1,13 @@
 package com.example.schedule.user.api;
 
+import com.example.schedule.user.dto.request.UpdateUserInfoRequest;
 import com.example.schedule.user.dto.response.UserInfoResponse;
 import com.example.schedule.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/users")
@@ -23,6 +21,14 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable Long id) {
         UserInfoResponse userInfoResponse = userService.getUserInfo(id);
+        return ResponseEntity.ok(userInfoResponse);
+    }
+
+    @Operation(summary = "회원 정보 수정", description = "회원 정보를 수정합니다.")
+    @ApiResponse(responseCode = "200", description = "회원 정보 수정 성공")
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserInfoResponse> editUserInfo(@PathVariable Long id, @RequestBody UpdateUserInfoRequest request) {
+        UserInfoResponse userInfoResponse = userService.updateUserInfo(id, request);
         return ResponseEntity.ok(userInfoResponse);
     }
 }
