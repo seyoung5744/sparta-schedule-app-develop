@@ -9,12 +9,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/v1/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+
+    @Operation(summary = "회원 목록 조회", description = "회원 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "회원 목록 조회 성공")
+    @GetMapping
+    public ResponseEntity<List<UserInfoResponse>> getAllUsers() {
+        List<UserInfoResponse> userInfoResponses = userService.getAllUsers();
+        return ResponseEntity.ok(userInfoResponses);
+    }
 
     @Operation(summary = "회원 정보 조회", description = "회원 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공")
