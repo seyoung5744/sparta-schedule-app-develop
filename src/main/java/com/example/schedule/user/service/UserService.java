@@ -36,6 +36,13 @@ public class UserService {
         return UserInfoResponse.of(user);
     }
 
+    @Transactional
+    public void deleteUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 회원입니다."));
+        userRepository.delete(user);
+    }
+
     private boolean isUserExistsByEmailAndIdIsNot(String email, Long id) {
         return userRepository.existsByEmailAndIdIsNot(email, id);
     }

@@ -31,4 +31,12 @@ public class UserController {
         UserInfoResponse userInfoResponse = userService.updateUserInfo(id, request);
         return ResponseEntity.ok(userInfoResponse);
     }
+
+    @Operation(summary = "회원 삭제", description = "회원을 삭제합니다.")
+    @ApiResponse(responseCode = "204", description = "회원 삭제 성공 (No Content)")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUserById(id);
+        return ResponseEntity.noContent().build();
+    }
 }
