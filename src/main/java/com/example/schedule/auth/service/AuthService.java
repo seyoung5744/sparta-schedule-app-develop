@@ -3,12 +3,19 @@ package com.example.schedule.auth.service;
 import com.example.schedule.auth.dto.request.LoginRequest;
 import com.example.schedule.auth.dto.request.SignUpRequest;
 import com.example.schedule.auth.dto.response.AuthInfoResponse;
+import com.example.schedule.auth.exception.AuthErrorCode;
+import com.example.schedule.auth.exception.InvalidCredentialsException;
 import com.example.schedule.user.entity.User;
+import com.example.schedule.user.exception.DuplicationEmailException;
+import com.example.schedule.user.exception.InvalidUserException;
 import com.example.schedule.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+
+import static com.example.schedule.user.exception.UserErrorCode.DUPLICATE_EMAIL;
+import static com.example.schedule.user.exception.UserErrorCode.INVALID_USER;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +28,7 @@ public class AuthService {
     public AuthInfoResponse signUp(SignUpRequest request) {
 
         if (isUserExistsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("이미 등록된 이메일입니다.");
+            throw new DuplicationEmailException(DUPLICATE_EMAIL);
         }
 
         User user = userRepository.save(request.toEntity());
@@ -30,7 +37,7 @@ public class AuthService {
 
     public AuthInfoResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 회원입니다."));
+                .orElseThrow(() -> new InvalidUserException(INVALID_USER));
 
         validatePasswordMatch(user.getPassword(), request.getPassword());
         return AuthInfoResponse.of(user);
@@ -42,7 +49,7 @@ public class AuthService {
 
     private void validatePasswordMatch(String storedPassword, String inputPassword) {
         if (!ObjectUtils.nullSafeEquals(storedPassword, inputPassword)) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new InvalidCredentialsException(AuthErrorCode.INVALID_CREDENTIALS);
         }
     }
 }
