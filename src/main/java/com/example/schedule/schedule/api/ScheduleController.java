@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class ScheduleController {
     @Operation(summary = "일정 생성", description = "새로운 일정을 등록합니다.")
     @ApiResponse(responseCode = "201", description = "일정 생성 성공")
     @PostMapping
-    public ResponseEntity<ScheduleResponse> create(@RequestBody CreateScheduleRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<ScheduleResponse> create(@Valid @RequestBody CreateScheduleRequest request, HttpServletRequest httpRequest) {
         HttpSession session = httpRequest.getSession();
         AuthInfoResponse authInfoResponse = (AuthInfoResponse) session.getAttribute("login_user");
 
@@ -58,7 +59,7 @@ public class ScheduleController {
     @Operation(summary = "일정 수정", description = "ID에 해당하는 일정의 제목, 내용을 수정합니다.")
     @ApiResponse(responseCode = "200", description = "일정 수정 성공")
     @PatchMapping("/{id}")
-    public ResponseEntity<ScheduleResponse> editScheduleTitleAndContents(@PathVariable Long id, @RequestBody EditScheduleTitleAndContentsRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<ScheduleResponse> editScheduleTitleAndContents(@PathVariable Long id, @Valid @RequestBody EditScheduleTitleAndContentsRequest request, HttpServletRequest httpRequest) {
         HttpSession session = httpRequest.getSession();
         AuthInfoResponse authInfoResponse = (AuthInfoResponse) session.getAttribute("login_user");
 

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +41,7 @@ public class UserController {
     @Operation(summary = "회원 정보 수정", description = "회원 정보를 수정합니다.")
     @ApiResponse(responseCode = "200", description = "회원 정보 수정 성공")
     @PatchMapping("/{id}")
-    public ResponseEntity<UserInfoResponse> editUserInfo(@PathVariable Long id, @RequestBody UpdateUserInfoRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<UserInfoResponse> editUserInfo(@PathVariable Long id, @Valid @RequestBody UpdateUserInfoRequest request, HttpServletRequest httpRequest) {
         HttpSession session = httpRequest.getSession();
         AuthInfoResponse authInfoResponse = (AuthInfoResponse) session.getAttribute("login_user");
 
