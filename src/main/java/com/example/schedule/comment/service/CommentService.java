@@ -1,6 +1,7 @@
 package com.example.schedule.comment.service;
 
 import com.example.schedule.comment.dto.request.CreateCommentRequest;
+import com.example.schedule.comment.dto.response.CommentListResponse;
 import com.example.schedule.comment.dto.response.CommentResponse;
 import com.example.schedule.comment.entity.Comment;
 import com.example.schedule.comment.repository.CommentRepository;
@@ -16,6 +17,8 @@ import com.example.schedule.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static com.example.schedule.schedule.exception.ScheduleErrorCode.UNAUTHORIZED_SCHEDULE_ACCESS;
 
@@ -44,5 +47,12 @@ public class CommentService {
 
         Comment comment = commentRepository.save(request.toEntity(user, schedule));
         return CommentResponse.of(comment, user, schedule);
+    }
+
+    public CommentListResponse getAllComments(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new InvalidScheduleException(ScheduleErrorCode.INVALID_SCHEDULE));
+        List<Comment> comments = commentRepository.findAllBySchedule(schedule);
+        return CommentListResponse.of(schedule.getUser(), schedule, comments);
     }
 }

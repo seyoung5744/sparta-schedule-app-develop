@@ -2,6 +2,7 @@ package com.example.schedule.comment.api;
 
 import com.example.schedule.auth.dto.response.AuthInfoResponse;
 import com.example.schedule.comment.dto.request.CreateCommentRequest;
+import com.example.schedule.comment.dto.response.CommentListResponse;
 import com.example.schedule.comment.dto.response.CommentResponse;
 import com.example.schedule.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,5 +34,13 @@ public class CommentController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(commentResponse);
+    }
+
+    @Operation(summary = "댓글 목록 조회", description = "댓글 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "댓글 목록 조회 성공")
+    @GetMapping
+    public ResponseEntity<CommentListResponse> getAllComments(@PathVariable Long scheduleId) {
+        CommentListResponse commentListResponse = commentService.getAllComments(scheduleId);
+        return ResponseEntity.ok(commentListResponse);
     }
 }
