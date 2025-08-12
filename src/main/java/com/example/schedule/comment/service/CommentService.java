@@ -4,6 +4,8 @@ import com.example.schedule.comment.dto.request.CreateCommentRequest;
 import com.example.schedule.comment.dto.response.CommentListResponse;
 import com.example.schedule.comment.dto.response.CommentResponse;
 import com.example.schedule.comment.entity.Comment;
+import com.example.schedule.comment.exception.CommentErrorCode;
+import com.example.schedule.comment.exception.InvalidCommentException;
 import com.example.schedule.comment.repository.CommentRepository;
 import com.example.schedule.schedule.entity.Schedule;
 import com.example.schedule.schedule.exception.InvalidScheduleException;
@@ -54,5 +56,15 @@ public class CommentService {
                 .orElseThrow(() -> new InvalidScheduleException(ScheduleErrorCode.INVALID_SCHEDULE));
         List<Comment> comments = commentRepository.findAllBySchedule(schedule);
         return CommentListResponse.of(schedule.getUser(), schedule, comments);
+    }
+
+    public CommentResponse getComment(Long scheduleId, Long id) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new InvalidScheduleException(ScheduleErrorCode.INVALID_SCHEDULE));
+
+        Comment comment = commentRepository.findByIdAndSchedule(id, schedule)
+                .orElseThrow(() -> new InvalidCommentException(CommentErrorCode.INVALID_COMMENT));
+
+        return CommentResponse.of(comment, schedule.getUser(), schedule);
     }
 }

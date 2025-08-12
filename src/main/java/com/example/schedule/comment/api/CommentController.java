@@ -43,4 +43,12 @@ public class CommentController {
         CommentListResponse commentListResponse = commentService.getAllComments(scheduleId);
         return ResponseEntity.ok(commentListResponse);
     }
+
+    @Operation(summary = "댓글 단건 조회", description = "댓글 단건을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "댓글 단건 조회 성공")
+    @GetMapping("/{id}")
+    public ResponseEntity<CommentResponse> getComment(@PathVariable Long scheduleId, @PathVariable Long id) {
+        CommentResponse commentResponse = commentService.getComment(scheduleId, id);
+        return ResponseEntity.ok(commentResponse);
+    }
 }
