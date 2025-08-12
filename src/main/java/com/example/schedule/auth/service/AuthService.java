@@ -5,17 +5,17 @@ import com.example.schedule.auth.dto.request.SignUpRequest;
 import com.example.schedule.auth.dto.response.AuthInfoResponse;
 import com.example.schedule.auth.exception.AuthErrorCode;
 import com.example.schedule.auth.exception.InvalidCredentialsException;
+import com.example.schedule.common.utils.PasswordEncoder;
 import com.example.schedule.user.entity.User;
 import com.example.schedule.user.exception.DuplicationEmailException;
-import com.example.schedule.user.exception.InvalidUserException;
+import com.example.schedule.user.exception.InvalidEmailException;
 import com.example.schedule.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import static com.example.schedule.user.exception.UserErrorCode.DUPLICATE_EMAIL;
-import static com.example.schedule.user.exception.UserErrorCode.INVALID_USER;
+import static com.example.schedule.user.exception.UserErrorCode.INVALID_EMAIL;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +23,7 @@ import static com.example.schedule.user.exception.UserErrorCode.INVALID_USER;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public AuthInfoResponse signUp(SignUpRequest request) {
@@ -31,15 +32,16 @@ public class AuthService {
             throw new DuplicationEmailException(DUPLICATE_EMAIL);
         }
 
-        User user = userRepository.save(request.toEntity());
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        User user = userRepository.save(request.toEntity(encodedPassword));
         return AuthInfoResponse.of(user);
     }
 
     public AuthInfoResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new InvalidUserException(INVALID_USER));
+                .orElseThrow(() -> new InvalidEmailException(INVALID_EMAIL));
 
-        validatePasswordMatch(user.getPassword(), request.getPassword());
+        validatePasswordMatch(request.getPassword(), user.getPassword());
         return AuthInfoResponse.of(user);
     }
 
@@ -47,8 +49,8 @@ public class AuthService {
         return userRepository.existsByEmail(email);
     }
 
-    private void validatePasswordMatch(String storedPassword, String inputPassword) {
-        if (!ObjectUtils.nullSafeEquals(storedPassword, inputPassword)) {
+    private void validatePasswordMatch(String rawPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new InvalidCredentialsException(AuthErrorCode.INVALID_CREDENTIALS);
         }
     }
