@@ -1,15 +1,21 @@
 package com.example.schedule.user.service;
 
+import com.example.schedule.auth.exception.ForbiddenUserAccessException;
 import com.example.schedule.user.dto.request.UpdateUserInfoRequest;
 import com.example.schedule.user.dto.response.UserInfoResponse;
 import com.example.schedule.user.entity.User;
+import com.example.schedule.user.exception.DuplicationEmailException;
+import com.example.schedule.user.exception.InvalidUserException;
 import com.example.schedule.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+
+import static com.example.schedule.auth.exception.AuthErrorCode.FORBIDDEN_USER_ACCESS;
+import static com.example.schedule.user.exception.UserErrorCode.DUPLICATE_EMAIL;
+import static com.example.schedule.user.exception.UserErrorCode.INVALID_USER;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +32,7 @@ public class UserService {
 
     public UserInfoResponse getUserInfo(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 회원입니다."));
+                .orElseThrow(() -> new InvalidUserException(INVALID_USER));
         return UserInfoResponse.of(user);
     }
 
@@ -34,17 +40,17 @@ public class UserService {
     public UserInfoResponse updateUserInfo(Long id, UpdateUserInfoRequest request, Long loginId) {
 
         if (isUserExistsByEmailAndIdIsNot(request.getEmail(), id)) {
-            throw new IllegalArgumentException("이미 사용중인 이메일입니다.");
+            throw new DuplicationEmailException(DUPLICATE_EMAIL);
         }
 
         User loginUser = userRepository.findById(loginId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 회원입니다."));
+                .orElseThrow(() -> new InvalidUserException(INVALID_USER));
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 회원입니다."));
+                .orElseThrow(() -> new InvalidUserException(INVALID_USER));
 
         if (!loginUser.isOwnerOf(user)) {
-            throw new IllegalArgumentException("권한이 없습니다.");
+            throw new ForbiddenUserAccessException(FORBIDDEN_USER_ACCESS);
         }
 
         user.updateNameAndEmail(request.getName(), request.getEmail());
@@ -55,13 +61,13 @@ public class UserService {
     @Transactional
     public void deleteUserById(Long id, Long loginId) {
         User loginUser = userRepository.findById(loginId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 회원입니다."));
+                .orElseThrow(() -> new InvalidUserException(INVALID_USER));
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 회원입니다."));
+                .orElseThrow(() -> new InvalidUserException(INVALID_USER));
 
         if (!loginUser.isOwnerOf(user)) {
-            throw new IllegalArgumentException("권한이 없습니다.");
+            throw new ForbiddenUserAccessException(FORBIDDEN_USER_ACCESS);
         }
 
         userRepository.delete(user);
