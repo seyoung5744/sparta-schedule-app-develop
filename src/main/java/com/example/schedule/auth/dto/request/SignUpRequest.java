@@ -29,7 +29,7 @@ public class SignUpRequest {
     )
     private final String password;
 
-    public User toEntity() {
-        return User.create(name, email, password);
+    public User toEntity(String encodedPassword) {
+        return User.create(name, email, encodedPassword);
     }
 }

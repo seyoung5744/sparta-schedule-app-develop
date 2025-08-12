@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum UserErrorCode implements ErrorCode {
 
     INVALID_USER(HttpStatus.BAD_REQUEST, "존재하지 않은 회원입니다."),
+    INVALID_EMAIL(HttpStatus.BAD_REQUEST, "존재하지 않은 이메일입니다."),
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "이미 사용중인 이메일입니다.");
 
     private final HttpStatus httpStatus;
