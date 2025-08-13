@@ -44,12 +44,6 @@ public class CommentService {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new InvalidScheduleException(ScheduleErrorCode.INVALID_SCHEDULE));
 
-//        // 일정을 등록한 유저와 로그인 유저가 동일하지 않으면 "일정에 접근 권한이 없습니다."
-//        // TODO : 현재 일정을 등록한 유저만 댓글 달기가 가능하므로 해당 조건 제거 고려하기
-//        if (!user.isOwnerOf(schedule.getUser())) {
-//            throw new UnauthorizedScheduleAccessException(UNAUTHORIZED_SCHEDULE_ACCESS);
-//        }
-
         Comment comment = commentRepository.save(request.toEntity(user, schedule));
         return CommentResponse.of(comment, schedule);
     }

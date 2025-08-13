@@ -27,17 +27,22 @@ public class Comment extends BaseEntity {
 
     private String contents;
 
-    private Comment(User user, Schedule schedule, String contents) {
+    private Comment(User user, String contents) {
         this.user = user;
-        this.schedule = schedule;
         this.contents = contents;
     }
 
     public static Comment create(User user, Schedule schedule, String contents) {
-        return new Comment(user, schedule, contents);
+        Comment comment = new Comment(user, contents);
+        schedule.addComment(comment);
+        return comment;
     }
 
     public void updateContents(String contents) {
         this.contents = contents;
+    }
+
+    public void addSchedule(Schedule schedule) {
+        this.schedule = schedule;
     }
 }
