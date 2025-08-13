@@ -5,19 +5,15 @@ import com.example.schedule.schedule.dto.request.EditScheduleTitleAndContentsReq
 import com.example.schedule.schedule.dto.response.PagingScheduleResponse;
 import com.example.schedule.schedule.dto.response.ScheduleResponse;
 import com.example.schedule.schedule.entity.Schedule;
-import com.example.schedule.schedule.exception.InvalidScheduleException;
 import com.example.schedule.schedule.exception.UnauthorizedScheduleAccessException;
 import com.example.schedule.schedule.repository.ScheduleRepository;
 import com.example.schedule.user.entity.User;
-import com.example.schedule.user.exception.InvalidUserException;
-import com.example.schedule.user.exception.UserErrorCode;
 import com.example.schedule.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.example.schedule.schedule.exception.ScheduleErrorCode.INVALID_SCHEDULE;
 import static com.example.schedule.schedule.exception.ScheduleErrorCode.UNAUTHORIZED_SCHEDULE_ACCESS;
 
 @Service
@@ -30,15 +26,13 @@ public class ScheduleService {
 
     @Transactional
     public ScheduleResponse create(final CreateScheduleRequest request, final Long loginId) {
-        User user = userRepository.findById(loginId)
-                .orElseThrow(() -> new InvalidUserException(UserErrorCode.INVALID_USER));
+        User user = userRepository.findByIdOrElseThrow(loginId);
         final Schedule schedule = scheduleRepository.save(request.toEntity(user));
         return ScheduleResponse.of(schedule);
     }
 
     public ScheduleResponse getScheduleById(final Long id) {
-        Schedule schedule = scheduleRepository.findById(id)
-                .orElseThrow(() -> new InvalidScheduleException(INVALID_SCHEDULE));
+        Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
         return ScheduleResponse.of(schedule);
     }
 
@@ -50,11 +44,8 @@ public class ScheduleService {
 
     @Transactional
     public ScheduleResponse editScheduleTitleAndContents(final Long id, final EditScheduleTitleAndContentsRequest request, final Long loginId) {
-        User loginUser = userRepository.findById(loginId)
-                .orElseThrow(() -> new InvalidUserException(UserErrorCode.INVALID_USER));
-
-        Schedule schedule = scheduleRepository.findById(id)
-                .orElseThrow(() -> new InvalidScheduleException(INVALID_SCHEDULE));
+        User loginUser = userRepository.findByIdOrElseThrow(loginId);
+        Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
 
         if (!loginUser.isOwnerOf(schedule.getUser())) {
             throw new UnauthorizedScheduleAccessException(UNAUTHORIZED_SCHEDULE_ACCESS);
@@ -66,11 +57,8 @@ public class ScheduleService {
 
     @Transactional
     public void deleteById(final Long id, final Long loginId) {
-        User loginUser = userRepository.findById(loginId)
-                .orElseThrow(() -> new InvalidUserException(UserErrorCode.INVALID_USER));
-
-        Schedule schedule = scheduleRepository.findById(id)
-                .orElseThrow(() -> new InvalidScheduleException(INVALID_SCHEDULE));
+        User loginUser = userRepository.findByIdOrElseThrow(loginId);
+        Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
 
         if (!loginUser.isOwnerOf(schedule.getUser())) {
             throw new UnauthorizedScheduleAccessException(UNAUTHORIZED_SCHEDULE_ACCESS);
