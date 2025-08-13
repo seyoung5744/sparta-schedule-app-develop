@@ -1,6 +1,5 @@
 package com.example.schedule.comment.api;
 
-import com.example.schedule.auth.dto.response.AuthInfoResponse;
 import com.example.schedule.comment.api.docs.CommentApi;
 import com.example.schedule.comment.dto.request.CreateCommentRequest;
 import com.example.schedule.comment.dto.request.EditCommentRequest;
@@ -8,8 +7,8 @@ import com.example.schedule.comment.dto.response.CommentListResponse;
 import com.example.schedule.comment.dto.response.CommentResponse;
 import com.example.schedule.comment.service.CommentService;
 import com.example.schedule.common.response.ApiResponse;
+import com.example.schedule.common.session.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +20,12 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController implements CommentApi {
 
     private final CommentService commentService;
+    private final SessionService sessionService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<CommentResponse>> addComment(@PathVariable Long scheduleId, @Valid @RequestBody CreateCommentRequest request, HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession(false);
-        AuthInfoResponse authInfoResponse = (AuthInfoResponse) session.getAttribute("login_user");
-        Long loginId = authInfoResponse.getId();
-
-        CommentResponse commentResponse = commentService.addComment(scheduleId, loginId, request);
+        Long loginUserId = sessionService.getLoginUserIdFromSession(httpRequest);
+        CommentResponse commentResponse = commentService.addComment(scheduleId, loginUserId, request);
         return ApiResponse.created(commentResponse);
     }
 
@@ -46,21 +43,15 @@ public class CommentController implements CommentApi {
 
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse<CommentResponse>> editComment(@PathVariable Long scheduleId, @PathVariable Long id, @Valid @RequestBody EditCommentRequest request, HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession(false);
-        AuthInfoResponse authInfoResponse = (AuthInfoResponse) session.getAttribute("login_user");
-        Long loginId = authInfoResponse.getId();
-
-        CommentResponse commentResponse = commentService.editComment(loginId, scheduleId, id, request);
+        Long loginUserId = sessionService.getLoginUserIdFromSession(httpRequest);
+        CommentResponse commentResponse = commentService.editComment(loginUserId, scheduleId, id, request);
         return ApiResponse.success(commentResponse);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteComment(@PathVariable Long scheduleId, @PathVariable Long id, HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession(false);
-        AuthInfoResponse authInfoResponse = (AuthInfoResponse) session.getAttribute("login_user");
-        Long loginId = authInfoResponse.getId();
-
-        commentService.deleteComment(loginId, scheduleId, id);
+        Long loginUserId = sessionService.getLoginUserIdFromSession(httpRequest);
+        commentService.deleteComment(loginUserId, scheduleId, id);
         return ApiResponse.noContent();
     }
 
