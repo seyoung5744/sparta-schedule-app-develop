@@ -66,5 +66,27 @@ public class CommentService {
                 .orElseThrow(() -> new InvalidCommentException(CommentErrorCode.INVALID_COMMENT));
 
         return CommentResponse.of(comment, schedule.getUser(), schedule);
+
+    /**
+     * 댓글 작성자와 로그인 유저가 동일하다면 수정 가능.
+     */
+    @Transactional
+    public CommentResponse editComment(Long loginId, Long scheduleId, Long id, @Valid EditCommentRequest request) {
+        User user = userRepository.findById(loginId)
+                .orElseThrow(() -> new InvalidUserException(UserErrorCode.INVALID_USER));
+
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new InvalidScheduleException(ScheduleErrorCode.INVALID_SCHEDULE));
+
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new InvalidCommentException(CommentErrorCode.INVALID_COMMENT));
+
+        if (!user.isOwnerOf(comment.getUser())) {
+            throw new UnauthorizedCommentAccessException(UNAUTHORIZED_COMMENT_ACCESS);
+        }
+
+        comment.updateContents(request.getContents());
+        commentRepository.flush();
+        return CommentResponse.of(comment, user, schedule);
     }
 }

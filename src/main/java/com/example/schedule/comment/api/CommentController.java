@@ -2,6 +2,7 @@ package com.example.schedule.comment.api;
 
 import com.example.schedule.auth.dto.response.AuthInfoResponse;
 import com.example.schedule.comment.dto.request.CreateCommentRequest;
+import com.example.schedule.comment.dto.request.EditCommentRequest;
 import com.example.schedule.comment.dto.response.CommentListResponse;
 import com.example.schedule.comment.dto.response.CommentResponse;
 import com.example.schedule.comment.service.CommentService;
@@ -51,4 +52,18 @@ public class CommentController {
         CommentResponse commentResponse = commentService.getComment(scheduleId, id);
         return ResponseEntity.ok(commentResponse);
     }
+
+    @Operation(summary = "댓글 수정", description = "댓글을 수정합니다.")
+    @ApiResponse(responseCode = "200", description = "댓글 수정 성공")
+    @PatchMapping("/{id}")
+    public ResponseEntity<CommentResponse> editComment(@PathVariable Long scheduleId, @PathVariable Long id, @Valid @RequestBody EditCommentRequest request, HttpServletRequest httpRequest) {
+        HttpSession session = httpRequest.getSession(false);
+        AuthInfoResponse authInfoResponse = (AuthInfoResponse) session.getAttribute("login_user");
+        Long loginId = authInfoResponse.getId();
+
+        CommentResponse commentResponse = commentService.editComment(loginId, scheduleId, id, request);
+        return ResponseEntity.ok(commentResponse);
+    }
+
+
 }
