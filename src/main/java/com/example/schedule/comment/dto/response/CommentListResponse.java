@@ -14,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentListResponse {
 
-    private final WriterResponse writer;
     private final ScheduleResponse schedule;
     private final List<CommentResponse> comments;
 
@@ -23,6 +22,10 @@ public class CommentListResponse {
     private static class WriterResponse {
         private final Long id;
         private final String name;
+
+        public static WriterResponse of(User user) {
+            return new WriterResponse(user.getId(), user.getName());
+        }
     }
 
     @Getter
@@ -31,6 +34,11 @@ public class CommentListResponse {
         private final Long id;
         private final String title;
         private final String contents;
+        private final WriterResponse writer;
+
+        public static ScheduleResponse of(Schedule schedule) {
+            return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), WriterResponse.of(schedule.getUser()));
+        }
     }
 
     @Getter
@@ -38,18 +46,18 @@ public class CommentListResponse {
     private static class CommentResponse {
         private final Long id;
         private final String contents;
+        private final WriterResponse writer;
         private final LocalDateTime createdAt;
         private final LocalDateTime modifiedAt;
 
         public static CommentResponse of(Comment comment) {
-            return new CommentResponse(comment.getId(), comment.getContents(), comment.getCreateAt(), comment.getModifiedAt());
+            return new CommentResponse(comment.getId(), comment.getContents(), WriterResponse.of(comment.getUser()), comment.getCreateAt(), comment.getModifiedAt());
         }
     }
 
-    public static CommentListResponse of(User user, Schedule schedule, List<Comment> comments) {
+    public static CommentListResponse of(Schedule schedule, List<Comment> comments) {
         return new CommentListResponse(
-                new WriterResponse(user.getId(), user.getName()),
-                new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents()),
+                ScheduleResponse.of(schedule),
                 comments.stream()
                         .map(CommentResponse::of)
                         .toList()

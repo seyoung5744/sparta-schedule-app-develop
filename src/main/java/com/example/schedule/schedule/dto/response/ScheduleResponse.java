@@ -1,8 +1,11 @@
 package com.example.schedule.schedule.dto.response;
 
 import com.example.schedule.schedule.entity.Schedule;
+import com.example.schedule.user.entity.User;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -10,14 +13,14 @@ import java.time.LocalDateTime;
 public class ScheduleResponse {
 
     private final Long id;
-    private final String writer;
+    private final WriterResponse writer;
     private final String title;
     private final String contents;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
     @Builder
-    private ScheduleResponse(Long id, String writer, String title, String contents, LocalDateTime createdAt, LocalDateTime modifiedAt) {
+    private ScheduleResponse(Long id, WriterResponse writer, String title, String contents, LocalDateTime createdAt, LocalDateTime modifiedAt) {
         this.id = id;
         this.writer = writer;
         this.title = title;
@@ -26,10 +29,21 @@ public class ScheduleResponse {
         this.modifiedAt = modifiedAt;
     }
 
+    @Getter
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    private static class WriterResponse {
+        private final Long id;
+        private final String name;
+
+        public static WriterResponse of(User user) {
+            return new WriterResponse(user.getId(), user.getName());
+        }
+    }
+
     public static ScheduleResponse of(Schedule schedule) {
         return ScheduleResponse.builder()
                 .id(schedule.getId())
-                .writer(schedule.getWriter())
+                .writer(WriterResponse.of(schedule.getUser()))
                 .title(schedule.getTitle())
                 .contents(schedule.getContents())
                 .createdAt(schedule.getCreateAt())

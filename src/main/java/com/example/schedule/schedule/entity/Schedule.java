@@ -21,9 +21,6 @@ public class Schedule extends BaseEntity {
     private User user;
 
     @Column(nullable = false)
-    private String writer;
-
-    @Column(nullable = false)
     private String title;
 
     @Column(nullable = false)
@@ -31,7 +28,6 @@ public class Schedule extends BaseEntity {
 
     private Schedule(User user, String title, String contents) {
         this.user = user;
-        this.writer = user.getName();
         this.title = title;
         this.contents = contents;
     }
