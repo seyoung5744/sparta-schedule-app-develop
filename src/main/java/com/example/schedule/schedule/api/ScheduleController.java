@@ -3,7 +3,9 @@ package com.example.schedule.schedule.api;
 import com.example.schedule.auth.dto.response.AuthInfoResponse;
 import com.example.schedule.schedule.dto.request.CreateScheduleRequest;
 import com.example.schedule.schedule.dto.request.EditScheduleTitleAndContentsRequest;
+import com.example.schedule.schedule.dto.response.PagingScheduleResponse;
 import com.example.schedule.schedule.dto.response.ScheduleResponse;
+import com.example.schedule.schedule.entity.Schedule;
 import com.example.schedule.schedule.service.ScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,11 +14,12 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -51,9 +54,14 @@ public class ScheduleController {
     @Operation(summary = "전체 일정 조회", description = "전체 일정을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "전체 일정 조회 성공")
     @GetMapping
-    public ResponseEntity<List<ScheduleResponse>> getAllSchedule() {
-        List<ScheduleResponse> scheduleResponses = scheduleService.getAllSchedule();
-        return ResponseEntity.ok(scheduleResponses);
+    public ResponseEntity<PagingScheduleResponse> getAllSchedule(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.sort(Schedule.class)
+                .by(Schedule::getModifiedAt)
+                .descending());
+
+        return ResponseEntity.ok(scheduleService.getAllSchedule(pageable));
     }
 
     @Operation(summary = "일정 수정", description = "ID에 해당하는 일정의 제목, 내용을 수정합니다.")

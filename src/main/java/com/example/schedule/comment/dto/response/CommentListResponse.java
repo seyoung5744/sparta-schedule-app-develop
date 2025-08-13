@@ -4,6 +4,7 @@ import com.example.schedule.comment.entity.Comment;
 import com.example.schedule.schedule.entity.Schedule;
 import com.example.schedule.user.entity.User;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -30,14 +31,26 @@ public class CommentListResponse {
 
     @Getter
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder(access = AccessLevel.PRIVATE)
     private static class ScheduleResponse {
         private final Long id;
         private final String title;
         private final String contents;
+        private final int commentCount;
+        private final LocalDateTime createdAt;
+        private final LocalDateTime modifiedAt;
         private final WriterResponse writer;
 
         public static ScheduleResponse of(Schedule schedule) {
-            return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), WriterResponse.of(schedule.getUser()));
+            return ScheduleResponse.builder()
+                    .id(schedule.getId())
+                    .title(schedule.getTitle())
+                    .contents(schedule.getContents())
+                    .commentCount(schedule.getComments().size())
+                    .createdAt(schedule.getCreateAt())
+                    .modifiedAt(schedule.getModifiedAt())
+                    .writer(WriterResponse.of(schedule.getUser()))
+                    .build();
         }
     }
 

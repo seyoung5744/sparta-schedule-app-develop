@@ -37,12 +37,14 @@ public class CommentResponse {
         private final Long id;
         private final String title;
         private final String contents;
+        private final int commentCount;
         private final LocalDateTime createdAt;
         private final LocalDateTime modifiedAt;
         private final WriterResponse writer;
 
         public static ScheduleResponse of(Schedule schedule) {
-            return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getCreateAt(), schedule.getModifiedAt(), WriterResponse.of(schedule.getUser()));
+            return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(),
+                    schedule.getComments().size(), schedule.getCreateAt(), schedule.getModifiedAt(), WriterResponse.of(schedule.getUser()));
         }
     }
 

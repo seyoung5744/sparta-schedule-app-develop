@@ -16,15 +16,17 @@ public class ScheduleResponse {
     private final WriterResponse writer;
     private final String title;
     private final String contents;
+    private final int commentCount;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
     @Builder
-    private ScheduleResponse(Long id, WriterResponse writer, String title, String contents, LocalDateTime createdAt, LocalDateTime modifiedAt) {
+    private ScheduleResponse(Long id, WriterResponse writer, String title, String contents, int commentCount, LocalDateTime createdAt, LocalDateTime modifiedAt) {
         this.id = id;
         this.writer = writer;
         this.title = title;
         this.contents = contents;
+        this.commentCount = commentCount;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
     }
@@ -46,6 +48,7 @@ public class ScheduleResponse {
                 .writer(WriterResponse.of(schedule.getUser()))
                 .title(schedule.getTitle())
                 .contents(schedule.getContents())
+                .commentCount(schedule.getComments().size())
                 .createdAt(schedule.getCreateAt())
                 .modifiedAt(schedule.getModifiedAt())
                 .build();

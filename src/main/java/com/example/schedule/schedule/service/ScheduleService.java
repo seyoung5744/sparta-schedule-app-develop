@@ -2,6 +2,7 @@ package com.example.schedule.schedule.service;
 
 import com.example.schedule.schedule.dto.request.CreateScheduleRequest;
 import com.example.schedule.schedule.dto.request.EditScheduleTitleAndContentsRequest;
+import com.example.schedule.schedule.dto.response.PagingScheduleResponse;
 import com.example.schedule.schedule.dto.response.ScheduleResponse;
 import com.example.schedule.schedule.entity.Schedule;
 import com.example.schedule.schedule.exception.InvalidScheduleException;
@@ -12,10 +13,9 @@ import com.example.schedule.user.exception.InvalidUserException;
 import com.example.schedule.user.exception.UserErrorCode;
 import com.example.schedule.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 import static com.example.schedule.schedule.exception.ScheduleErrorCode.INVALID_SCHEDULE;
 import static com.example.schedule.schedule.exception.ScheduleErrorCode.UNAUTHORIZED_SCHEDULE_ACCESS;
@@ -42,10 +42,10 @@ public class ScheduleService {
         return ScheduleResponse.of(schedule);
     }
 
-    public List<ScheduleResponse> getAllSchedule() {
-        return scheduleRepository.findAll().stream()
-                .map(ScheduleResponse::of)
-                .toList();
+    public PagingScheduleResponse getAllSchedule(Pageable pageable) {
+        return PagingScheduleResponse.of(
+                scheduleRepository.findAll(pageable)
+        );
     }
 
     @Transactional
