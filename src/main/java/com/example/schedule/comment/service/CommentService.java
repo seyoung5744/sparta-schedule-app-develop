@@ -93,4 +93,24 @@ public class CommentService {
         commentRepository.flush();
         return CommentResponse.of(comment, schedule);
     }
+
+    @Transactional
+    public void deleteComment(Long loginId, Long scheduleId, Long id) {
+
+        if (!scheduleRepository.existsById(scheduleId)) {
+            throw new InvalidScheduleException(ScheduleErrorCode.INVALID_SCHEDULE);
+        }
+
+        User user = userRepository.findById(loginId)
+                .orElseThrow(() -> new InvalidUserException(UserErrorCode.INVALID_USER));
+
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new InvalidCommentException(CommentErrorCode.INVALID_COMMENT));
+
+        if (!user.isOwnerOf(comment.getUser())) {
+            throw new UnauthorizedCommentAccessException(UNAUTHORIZED_COMMENT_ACCESS);
+        }
+
+        commentRepository.delete(comment);
+    }
 }

@@ -65,5 +65,17 @@ public class CommentController {
         return ResponseEntity.ok(commentResponse);
     }
 
+    @Operation(summary = "댓글 삭제", description = "댓글을 삭제합니다.")
+    @ApiResponse(responseCode = "200", description = "댓글 삭제 성공 (No Content)")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long scheduleId, @PathVariable Long id, HttpServletRequest httpRequest) {
+        HttpSession session = httpRequest.getSession(false);
+        AuthInfoResponse authInfoResponse = (AuthInfoResponse) session.getAttribute("login_user");
+        Long loginId = authInfoResponse.getId();
+
+        commentService.deleteComment(loginId, scheduleId, id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
