@@ -1,13 +1,12 @@
 package com.example.schedule.user.api;
 
-import com.example.schedule.auth.dto.response.AuthInfoResponse;
 import com.example.schedule.common.response.ApiResponse;
+import com.example.schedule.common.session.SessionService;
 import com.example.schedule.user.api.docs.UserApi;
 import com.example.schedule.user.dto.request.UpdateUserInfoRequest;
 import com.example.schedule.user.dto.response.UserInfoResponse;
 import com.example.schedule.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +20,7 @@ import java.util.List;
 public class UserController implements UserApi {
 
     private final UserService userService;
+    private final SessionService sessionService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserInfoResponse>>> getAllUsers() {
@@ -36,19 +36,15 @@ public class UserController implements UserApi {
 
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse<UserInfoResponse>> editUserInfo(@PathVariable Long id, @Valid @RequestBody UpdateUserInfoRequest request, HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession();
-        AuthInfoResponse authInfoResponse = (AuthInfoResponse) session.getAttribute("login_user");
-
-        UserInfoResponse userInfoResponse = userService.updateUserInfo(id, request, authInfoResponse.getId());
+        Long loginUserId = sessionService.getLoginUserIdFromSession(httpRequest);
+        UserInfoResponse userInfoResponse = userService.updateUserInfo(id, request, loginUserId);
         return ApiResponse.success(userInfoResponse);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id, HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession();
-        AuthInfoResponse authInfoResponse = (AuthInfoResponse) session.getAttribute("login_user");
-
-        userService.deleteUserById(id, authInfoResponse.getId());
+        Long loginUserId = sessionService.getLoginUserIdFromSession(httpRequest);
+        userService.deleteUserById(id, loginUserId);
         return ApiResponse.noContent();
     }
 }

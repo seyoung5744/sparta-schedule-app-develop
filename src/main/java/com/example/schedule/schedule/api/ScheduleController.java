@@ -1,7 +1,7 @@
 package com.example.schedule.schedule.api;
 
-import com.example.schedule.auth.dto.response.AuthInfoResponse;
 import com.example.schedule.common.response.ApiResponse;
+import com.example.schedule.common.session.SessionService;
 import com.example.schedule.schedule.api.docs.ScheduleApi;
 import com.example.schedule.schedule.dto.request.CreateScheduleRequest;
 import com.example.schedule.schedule.dto.request.EditScheduleTitleAndContentsRequest;
@@ -10,7 +10,6 @@ import com.example.schedule.schedule.dto.response.ScheduleResponse;
 import com.example.schedule.schedule.entity.Schedule;
 import com.example.schedule.schedule.service.ScheduleService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,13 +26,12 @@ import org.springframework.web.bind.annotation.*;
 public class ScheduleController implements ScheduleApi {
 
     private final ScheduleService scheduleService;
+    private final SessionService sessionService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<ScheduleResponse>> create(@Valid @RequestBody CreateScheduleRequest request, HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession();
-        AuthInfoResponse authInfoResponse = (AuthInfoResponse) session.getAttribute("login_user");
-
-        ScheduleResponse scheduleResponse = scheduleService.create(request, authInfoResponse.getId());
+        Long loginUserId = sessionService.getLoginUserIdFromSession(httpRequest);
+        ScheduleResponse scheduleResponse = scheduleService.create(request, loginUserId);
         return ApiResponse.created(scheduleResponse);
     }
 
@@ -57,19 +55,15 @@ public class ScheduleController implements ScheduleApi {
 
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse<ScheduleResponse>> editScheduleTitleAndContents(@PathVariable Long id, @Valid @RequestBody EditScheduleTitleAndContentsRequest request, HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession();
-        AuthInfoResponse authInfoResponse = (AuthInfoResponse) session.getAttribute("login_user");
-
-        ScheduleResponse scheduleResponse = scheduleService.editScheduleTitleAndContents(id, request, authInfoResponse.getId());
+        Long loginUserId = sessionService.getLoginUserIdFromSession(httpRequest);
+        ScheduleResponse scheduleResponse = scheduleService.editScheduleTitleAndContents(id, request, loginUserId);
         return ApiResponse.success(scheduleResponse);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteSchedule(@PathVariable Long id, HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession();
-        AuthInfoResponse authInfoResponse = (AuthInfoResponse) session.getAttribute("login_user");
-
-        scheduleService.deleteById(id, authInfoResponse.getId());
+        Long loginUserId = sessionService.getLoginUserIdFromSession(httpRequest);
+        scheduleService.deleteById(id, loginUserId);
         return ApiResponse.noContent();
     }
 }

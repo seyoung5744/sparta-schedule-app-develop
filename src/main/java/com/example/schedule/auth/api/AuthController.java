@@ -6,8 +6,8 @@ import com.example.schedule.auth.dto.request.SignUpRequest;
 import com.example.schedule.auth.dto.response.AuthInfoResponse;
 import com.example.schedule.auth.service.AuthService;
 import com.example.schedule.common.response.ApiResponse;
+import com.example.schedule.common.session.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController implements AuthApi {
 
     private final AuthService authService;
+    private final SessionService sessionService;
 
     @PostMapping("/sign-up")
     public ResponseEntity<ApiResponse<AuthInfoResponse>> signUp(@Valid @RequestBody SignUpRequest request) {
@@ -32,10 +33,7 @@ public class AuthController implements AuthApi {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthInfoResponse>> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         AuthInfoResponse authInfoResponse = authService.login(loginRequest);
-
-        HttpSession session = request.getSession();
-        session.setAttribute("login_user", authInfoResponse);
-
+        sessionService.saveLoginUserToSession(request, authInfoResponse);
         return ApiResponse.success(authInfoResponse);
     }
 }
