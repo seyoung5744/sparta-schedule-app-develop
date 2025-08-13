@@ -3,7 +3,6 @@ package com.example.schedule.auth.service;
 import com.example.schedule.auth.dto.request.LoginRequest;
 import com.example.schedule.auth.dto.request.SignUpRequest;
 import com.example.schedule.auth.dto.response.AuthInfoResponse;
-import com.example.schedule.auth.exception.AuthErrorCode;
 import com.example.schedule.auth.exception.InvalidCredentialsException;
 import com.example.schedule.common.utils.PasswordEncoder;
 import com.example.schedule.user.entity.User;
@@ -14,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.example.schedule.auth.exception.AuthErrorCode.INVALID_CREDENTIALS;
 import static com.example.schedule.user.exception.UserErrorCode.DUPLICATE_EMAIL;
 import static com.example.schedule.user.exception.UserErrorCode.INVALID_EMAIL;
 
@@ -51,7 +51,7 @@ public class AuthService {
 
     private void validatePasswordMatch(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new InvalidCredentialsException(AuthErrorCode.INVALID_CREDENTIALS);
+            throw new InvalidCredentialsException(INVALID_CREDENTIALS);
         }
     }
 }
