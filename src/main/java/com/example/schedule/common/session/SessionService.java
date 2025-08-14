@@ -1,6 +1,6 @@
 package com.example.schedule.common.session;
 
-import com.example.schedule.auth.dto.response.AuthInfoResponse;
+import com.example.schedule.domain.auth.dto.response.AuthInfoResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Component;
