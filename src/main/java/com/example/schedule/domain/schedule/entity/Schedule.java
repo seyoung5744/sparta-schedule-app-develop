@@ -30,7 +30,7 @@ public class Schedule extends BaseEntity {
     @Column(nullable = false)
     private String contents;
 
-    @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     private Schedule(User user, String title, String contents) {
